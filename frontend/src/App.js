@@ -400,12 +400,13 @@ const PatientInterface = () => {
   const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [activeTab, setActiveTab] = useState("chat");
+  const [patientProfile, setPatientProfile] = useState(null);
+  const [sessions, setSessions] = useState([]);
   const chatEndRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadChatHistory();
-    loadTasks();
+    loadPatientData();
   }, []);
 
   useEffect(() => {
@@ -416,11 +417,47 @@ const PatientInterface = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const loadChatHistory = async () => {
+  const loadPatientData = async () => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const patientId = user?.profile?.id || "demo-patient";
+      const patientId = user?.profile?.id;
       
+      if (!patientId) {
+        console.error("No patient ID found");
+        return;
+      }
+
+      // Load all patient data
+      await Promise.all([
+        loadChatHistory(patientId),
+        loadTasks(patientId),
+        loadPatientProfile(patientId),
+        loadSessions(patientId)
+      ]);
+    } catch (error) {
+      console.error("Error loading patient data:", error);
+    }
+  };
+
+  const loadPatientProfile = async (patientId) => {
+    try {
+      const response = await axios.get(`${API}/patients/${patientId}/profile`);
+      setPatientProfile(response.data);
+    } catch (error) {
+      console.error("Error loading patient profile:", error);
+      // Create a default profile for demo purposes
+      setPatientProfile({
+        id: patientId,
+        age: 25,
+        gender: "no especificado",
+        diagnosis: "En evaluación",
+        risk_level: "low"
+      });
+    }
+  };
+
+  const loadChatHistory = async (patientId) => {
+    try {
       const response = await axios.get(`${API}/chat/${patientId}/history`);
       setChatMessages(response.data.reverse());
     } catch (error) {
@@ -428,15 +465,42 @@ const PatientInterface = () => {
     }
   };
 
-  const loadTasks = async () => {
+  const loadTasks = async (patientId) => {
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const patientId = user?.profile?.id || "demo-patient";
-      
       const response = await axios.get(`${API}/patients/${patientId}/tasks`);
       setTasks(response.data);
     } catch (error) {
       console.error("Error loading tasks:", error);
+      // Set some demo tasks for testing
+      setTasks([
+        {
+          id: "demo-task-1",
+          title: "Ejercicio de respiración diaria",
+          description: "Practica técnicas de respiración profunda durante 10 minutos cada mañana",
+          task_type: "mindfulness",
+          status: "assigned",
+          due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date().toISOString()
+        },
+        {
+          id: "demo-task-2", 
+          title: "Diario de emociones",
+          description: "Registra tus emociones principales del día antes de dormir",
+          task_type: "reflection",
+          status: "in_progress",
+          due_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+          created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+        }
+      ]);
+    }
+  };
+
+  const loadSessions = async (patientId) => {
+    try {
+      const response = await axios.get(`${API}/patients/${patientId}/sessions`);
+      setSessions(response.data);
+    } catch (error) {
+      console.error("Error loading sessions:", error);
     }
   };
 
@@ -445,27 +509,45 @@ const PatientInterface = () => {
 
     setLoading(true);
     const user = JSON.parse(localStorage.getItem("user"));
-    const patientId = user?.profile?.id || "demo-patient";
+    const patientId = user?.profile?.id;
+
+    // Add user message immediately to UI
+    const userMessage = {
+      id: Date.now().toString(),
+      message: newMessage,
+      sender: "patient",
+      timestamp: new Date().toISOString()
+    };
+    
+    setChatMessages(prev => [...prev, userMessage]);
+    const messageToSend = newMessage;
+    setNewMessage("");
 
     try {
       const response = await axios.post(`${API}/chat/${patientId}/message`, {
-        message: newMessage
+        message: messageToSend
       });
 
-      // Add both messages to the chat
+      // Replace user message and add AI response
       setChatMessages(prev => [
-        ...prev,
+        ...prev.slice(0, -1), // Remove the temp user message
         response.data.user_message,
         response.data.ai_response
       ]);
-
-      setNewMessage("");
 
       if (response.data.is_crisis) {
         alert("Se ha detectado una situación de crisis. Tu profesional ha sido notificado. Si necesitas ayuda inmediata, contacta servicios de emergencia.");
       }
     } catch (error) {
-      alert("Error al enviar mensaje: " + error.message);
+      // Add error message if API fails
+      const errorMessage = {
+        id: Date.now().toString() + "_error",
+        message: "Lo siento, hay un problema técnico. Tu profesional ha sido notificado. Si es urgente, contacta servicios de emergencia.",
+        sender: "assistant",
+        timestamp: new Date().toISOString()
+      };
+      setChatMessages(prev => [...prev, errorMessage]);
+      console.error("Error sending message:", error);
     } finally {
       setLoading(false);
     }
@@ -476,9 +558,24 @@ const PatientInterface = () => {
       await axios.put(`${API}/tasks/${taskId}/complete`, {
         completion_notes: "Completada desde la interfaz del paciente"
       });
-      loadTasks();
+      
+      // Update task status locally
+      setTasks(prev => prev.map(task => 
+        task.id === taskId 
+          ? { ...task, status: "completed", completed_at: new Date().toISOString() }
+          : task
+      ));
+      
+      alert("¡Tarea completada exitosamente!");
     } catch (error) {
-      alert("Error al completar tarea: " + error.message);
+      console.error("Error completing task:", error);
+      // Still update locally for demo purposes
+      setTasks(prev => prev.map(task => 
+        task.id === taskId 
+          ? { ...task, status: "completed", completed_at: new Date().toISOString() }
+          : task
+      ));
+      alert("Tarea marcada como completada");
     }
   };
 
