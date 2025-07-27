@@ -283,35 +283,75 @@ const ProfessionalDashboard = () => {
         </div>
 
         {/* Patients List */}
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b">
-            <h2 className="text-lg font-semibold text-gray-900">Mis Pacientes</h2>
+        <div className="bg-white rounded-xl shadow-lg border border-gray-100 fade-in" style={{animationDelay: "0.4s"}}>
+          <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white rounded-t-xl">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center">
+              👥 Mis Pacientes
+              <span className="ml-3 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-semibold">
+                {dashboardData.patients.length}
+              </span>
+            </h2>
           </div>
           <div className="p-6">
             {dashboardData.patients.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No hay pacientes asignados</p>
+              <div className="text-center py-12">
+                <div className="mx-auto h-24 w-24 text-gray-300 mb-4">
+                  <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
+                  </svg>
+                </div>
+                <p className="text-lg font-medium text-gray-500">No hay pacientes asignados</p>
+                <p className="text-gray-400 mt-2">Comienza agregando tu primer paciente</p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {dashboardData.patients.map((patient) => (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {dashboardData.patients.map((patient, index) => (
                   <div
                     key={patient.id}
-                    className="border rounded-lg p-4 hover:shadow-md transition cursor-pointer"
+                    className="patient-card slide-in-right"
+                    style={{animationDelay: `${0.1 * index}s`}}
                     onClick={() => setSelectedPatient(patient)}
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">Paciente #{patient.id.slice(-6)}</h3>
-                      <span className={`px-2 py-1 text-xs rounded-full ${
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-bold text-gray-900 text-lg">
+                        👤 Paciente #{patient.id.slice(-6)}
+                      </h3>
+                      <span className={`badge ${
                         patient.risk_level === 'high' ? 'bg-red-100 text-red-800' :
                         patient.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-green-100 text-green-800'
                       }`}>
-                        {patient.risk_level === 'high' ? 'Alto Riesgo' :
-                         patient.risk_level === 'medium' ? 'Riesgo Medio' : 'Riesgo Bajo'}
+                        {patient.risk_level === 'high' ? '🔴 Alto Riesgo' :
+                         patient.risk_level === 'medium' ? '🟡 Riesgo Medio' : '🟢 Riesgo Bajo'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600">Edad: {patient.age} años</p>
-                    <p className="text-sm text-gray-600">Género: {patient.gender}</p>
-                    <p className="text-sm text-gray-600">Sesiones: {patient.session_count}</p>
+                    
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600 flex items-center">
+                        <span className="mr-2">🎂</span>
+                        <strong>Edad:</strong> {patient.age} años
+                      </p>
+                      <p className="text-sm text-gray-600 flex items-center">
+                        <span className="mr-2">⚧️</span>
+                        <strong>Género:</strong> {patient.gender}
+                      </p>
+                      <p className="text-sm text-gray-600 flex items-center">
+                        <span className="mr-2">📊</span>
+                        <strong>Sesiones:</strong> {patient.session_count}
+                      </p>
+                    </div>
+                    
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">
+                          📅 {new Date(patient.created_at).toLocaleDateString()}
+                        </span>
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                          <span className="text-xs text-green-600 font-medium">Activo</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
