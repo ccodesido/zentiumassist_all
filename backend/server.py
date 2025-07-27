@@ -308,8 +308,12 @@ async def login_user(login_data: UserLogin):
 
 @api_router.get("/professionals/{professional_id}/patients", response_model=List[Patient])
 async def get_professional_patients(professional_id: str):
-    patients = await db.patients.find({"professional_id": professional_id}).to_list(100)
-    return [Patient(**patient) for patient in patients]
+    patients_docs = await db.patients.find({"professional_id": professional_id}).to_list(100)
+    patients = []
+    for patient_doc in patients_docs:
+        patient_doc.pop('_id', None)  # Remove MongoDB ObjectId
+        patients.append(Patient(**patient_doc))
+    return patients
 
 @api_router.post("/professionals/{professional_id}/patients", response_model=Patient)
 async def create_patient(professional_id: str, patient_data: PatientCreate):
