@@ -401,73 +401,82 @@ const ProfessionalDashboard = () => {
 
       {/* Add Patient Modal */}
       {showAddPatient && (
-        <div className="modal-overlay">
-          <div className="modal-content scale-in">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">➕ Agregar Nuevo Paciente</h3>
-              <p className="text-gray-600">Completa la información básica del paciente</p>
-            </div>
-            
-            <div className="space-y-6">
-              <div className="fade-in">
-                <label className="form-label">👤 Edad del paciente</label>
-                <input
-                  type="number"
-                  value={newPatient.age}
-                  onChange={(e) => setNewPatient({...newPatient, age: e.target.value})}
-                  className="form-input"
-                  placeholder="Ej: 25"
-                  min="1"
-                  max="120"
-                />
+        <>
+          <div 
+            className="modal-overlay"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowAddPatient(false);
+              }
+            }}
+          >
+            <div className="modal-content scale-in" onClick={(e) => e.stopPropagation()}>
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">➕ Agregar Nuevo Paciente</h3>
+                <p className="text-gray-600">Completa la información básica del paciente</p>
+              </div>
+              
+              <div className="space-y-6">
+                <div className="fade-in">
+                  <label className="form-label">👤 Edad del paciente</label>
+                  <input
+                    type="number"
+                    value={newPatient.age}
+                    onChange={(e) => setNewPatient({...newPatient, age: e.target.value})}
+                    className="form-input"
+                    placeholder="Ej: 25"
+                    min="1"
+                    max="120"
+                  />
+                </div>
+
+                <div className="fade-in" style={{animationDelay: "0.1s"}}>
+                  <label className="form-label">⚧️ Género</label>
+                  <select
+                    value={newPatient.gender}
+                    onChange={(e) => setNewPatient({...newPatient, gender: e.target.value})}
+                    className="form-input"
+                  >
+                    <option value="">Seleccionar género...</option>
+                    <option value="masculino">👨 Masculino</option>
+                    <option value="femenino">👩 Femenino</option>
+                    <option value="no binario">⚧️ No binario</option>
+                    <option value="otro">🏳️‍⚧️ Otro</option>
+                    <option value="prefiero no decir">❓ Prefiero no decir</option>
+                  </select>
+                </div>
+
+                <div className="fade-in" style={{animationDelay: "0.2s"}}>
+                  <label className="form-label">📞 Contacto de Emergencia</label>
+                  <input
+                    type="text"
+                    value={newPatient.emergency_contact}
+                    onChange={(e) => setNewPatient({...newPatient, emergency_contact: e.target.value})}
+                    className="form-input"
+                    placeholder="Ej: María González - 555-123-4567"
+                  />
+                </div>
               </div>
 
-              <div className="fade-in" style={{animationDelay: "0.1s"}}>
-                <label className="form-label">⚧️ Género</label>
-                <select
-                  value={newPatient.gender}
-                  onChange={(e) => setNewPatient({...newPatient, gender: e.target.value})}
-                  className="form-input"
+              <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
+                <button
+                  onClick={() => setShowAddPatient(false)}
+                  className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium rounded-lg hover:bg-gray-100 transition-colors"
                 >
-                  <option value="">Seleccionar género...</option>
-                  <option value="masculino">👨 Masculino</option>
-                  <option value="femenino">👩 Femenino</option>
-                  <option value="no binario">⚧️ No binario</option>
-                  <option value="otro">🏳️‍⚧️ Otro</option>
-                  <option value="prefiero no decir">❓ Prefiero no decir</option>
-                </select>
+                  ❌ Cancelar
+                </button>
+                <button
+                  onClick={addPatient}
+                  disabled={!newPatient.age || !newPatient.gender || !newPatient.emergency_contact}
+                  className="btn-primary disabled:opacity-50"
+                  style={{width: "auto"}}
+                >
+                  ✨ Agregar Paciente
+                </button>
               </div>
-
-              <div className="fade-in" style={{animationDelay: "0.2s"}}>
-                <label className="form-label">📞 Contacto de Emergencia</label>
-                <input
-                  type="text"
-                  value={newPatient.emergency_contact}
-                  onChange={(e) => setNewPatient({...newPatient, emergency_contact: e.target.value})}
-                  className="form-input"
-                  placeholder="Ej: María González - 555-123-4567"
-                />
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-4 mt-8 pt-6 border-t border-gray-200">
-              <button
-                onClick={() => setShowAddPatient(false)}
-                className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                ❌ Cancelar
-              </button>
-              <button
-                onClick={addPatient}
-                disabled={!newPatient.age || !newPatient.gender || !newPatient.emergency_contact}
-                className="btn-primary disabled:opacity-50"
-                style={{width: "auto"}}
-              >
-                ✨ Agregar Paciente
-              </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
