@@ -336,17 +336,29 @@ async def create_patient(professional_id: str, patient_data: PatientCreate):
 @api_router.get("/professionals/{professional_id}/dashboard")
 async def get_professional_dashboard(professional_id: str):
     # Get patients
-    patients = await db.patients.find({"professional_id": professional_id}).to_list(100)
+    patients_docs = await db.patients.find({"professional_id": professional_id}).to_list(100)
+    patients = []
+    for patient_doc in patients_docs:
+        patient_doc.pop('_id', None)  # Remove MongoDB ObjectId
+        patients.append(patient_doc)
     
     # Get recent sessions
-    recent_sessions = await db.sessions.find(
+    sessions_docs = await db.sessions.find(
         {"professional_id": professional_id}
     ).sort("created_at", -1).limit(10).to_list(10)
+    recent_sessions = []
+    for session_doc in sessions_docs:
+        session_doc.pop('_id', None)  # Remove MongoDB ObjectId
+        recent_sessions.append(session_doc)
     
     # Get crisis alerts
-    crisis_messages = await db.chat_messages.find(
+    crisis_docs = await db.chat_messages.find(
         {"is_crisis": True}
     ).sort("timestamp", -1).limit(5).to_list(5)
+    crisis_messages = []
+    for crisis_doc in crisis_docs:
+        crisis_doc.pop('_id', None)  # Remove MongoDB ObjectId
+        crisis_messages.append(crisis_doc)
     
     return {
         "patients_count": len(patients),
