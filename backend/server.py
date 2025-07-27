@@ -446,11 +446,16 @@ async def send_chat_message(patient_id: str, message_data: ChatMessageCreate):
 
 @api_router.get("/chat/{patient_id}/history")
 async def get_chat_history(patient_id: str, limit: int = 50):
-    messages = await db.chat_messages.find(
+    messages_docs = await db.chat_messages.find(
         {"patient_id": patient_id}
     ).sort("timestamp", -1).limit(limit).to_list(limit)
     
-    return [ChatMessage(**msg) for msg in messages]
+    messages = []
+    for msg_doc in messages_docs:
+        msg_doc.pop('_id', None)  # Remove MongoDB ObjectId
+        messages.append(ChatMessage(**msg_doc))
+    
+    return messages
 
 # =============================================================================
 # SESSIONS
