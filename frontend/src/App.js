@@ -627,7 +627,27 @@ const PatientInterface = () => {
                 : "text-gray-600 hover:text-gray-900"
             }`}
           >
-            📋 Mis Tareas
+            📋 Mis Tareas ({tasks.filter(t => t.status !== "completed").length})
+          </button>
+          <button
+            onClick={() => setActiveTab("profile")}
+            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition ${
+              activeTab === "profile"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            👤 Mi Perfil
+          </button>
+          <button
+            onClick={() => setActiveTab("sessions")}
+            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition ${
+              activeTab === "sessions"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            📅 Mis Sesiones
           </button>
         </div>
 
