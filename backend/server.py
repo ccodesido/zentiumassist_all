@@ -279,19 +279,26 @@ async def login_user(login_data: UserLogin):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     
-    # In production, verify password hash
+    # Remove MongoDB _id field and convert to UserBase
+    user.pop('_id', None)  # Remove MongoDB ObjectId
     user_obj = UserBase(**user)
     
     # Get additional profile info
     profile = None
     if user_obj.role == UserRole.PROFESSIONAL:
-        profile = await db.professionals.find_one({"user_id": user_obj.id})
+        profile_doc = await db.professionals.find_one({"user_id": user_obj.id})
+        if profile_doc:
+            profile_doc.pop('_id', None)  # Remove MongoDB ObjectId
+            profile = Professional(**profile_doc)
     elif user_obj.role == UserRole.PATIENT:
-        profile = await db.patients.find_one({"user_id": user_obj.id})
+        profile_doc = await db.patients.find_one({"user_id": user_obj.id})
+        if profile_doc:
+            profile_doc.pop('_id', None)  # Remove MongoDB ObjectId
+            profile = Patient(**profile_doc)
     
     return {
         "user": user_obj,
-        "profile": profile,
+        "profile": profile.dict() if profile else None,
         "token": f"mock-token-{user_obj.id}"  # In production, use JWT
     }
 
