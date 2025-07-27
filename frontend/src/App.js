@@ -783,20 +783,148 @@ const PatientInterface = () => {
           </div>
         )}
 
-        {/* Emergency Contact */}
-        <div className="mt-8 bg-red-50 border border-red-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            <div>
-              <h3 className="text-sm font-medium text-red-800">Emergencia</h3>
-              <p className="text-sm text-red-600">
-                Si sientes que estás en crisis o peligro, contacta inmediatamente a servicios de emergencia: 911
-              </p>
-            </div>
+        {/* Profile Interface */}
+        {activeTab === "profile" && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Mi Perfil</h2>
+            
+            {patientProfile ? (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Edad</label>
+                      <p className="mt-1 text-sm text-gray-900">{patientProfile.age} años</p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Género</label>
+                      <p className="mt-1 text-sm text-gray-900">{patientProfile.gender}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Diagnóstico</label>
+                      <p className="mt-1 text-sm text-gray-900">{patientProfile.diagnosis || "En evaluación"}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Nivel de Riesgo</label>
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                        patientProfile.risk_level === 'high' ? 'bg-red-100 text-red-800' :
+                        patientProfile.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-green-100 text-green-800'
+                      }`}>
+                        {patientProfile.risk_level === 'high' ? 'Alto' :
+                         patientProfile.risk_level === 'medium' ? 'Medio' : 'Bajo'}
+                      </span>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Sesiones Realizadas</label>
+                      <p className="mt-1 text-sm text-gray-900">{patientProfile.session_count || 0}</p>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Última Sesión</label>
+                      <p className="mt-1 text-sm text-gray-900">
+                        {patientProfile.last_session 
+                          ? new Date(patientProfile.last_session).toLocaleDateString()
+                          : "No hay sesiones registradas"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="mt-6 pt-6 border-t border-gray-200">
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Estadísticas de Progreso</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-blue-50 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-blue-600">{tasks.filter(t => t.status === "completed").length}</div>
+                      <div className="text-sm text-blue-800">Tareas Completadas</div>
+                    </div>
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-green-600">{chatMessages.filter(m => m.sender === "patient").length}</div>
+                      <div className="text-sm text-green-800">Mensajes Enviados</div>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-purple-600">{sessions.length}</div>
+                      <div className="text-sm text-purple-800">Sesiones Registradas</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                <p>Cargando información del perfil...</p>
+              </div>
+            )}
           </div>
-        </div>
+        )}
+
+        {/* Sessions Interface */}
+        {activeTab === "sessions" && (
+          <div className="bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Mis Sesiones</h2>
+            
+            {sessions.length === 0 ? (
+              <div className="text-center text-gray-500 py-8">
+                <div className="mx-auto h-12 w-12 text-gray-400 mb-4">
+                  📅
+                </div>
+                <p>No tienes sesiones registradas aún.</p>
+                <p className="text-sm mt-2">Las sesiones con tu profesional aparecerán aquí.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {sessions.map((session) => (
+                  <div
+                    key={session.id}
+                    className="border rounded-lg p-4 hover:shadow-sm transition-shadow"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900">
+                          Sesión {session.session_type === 'therapy' ? 'de Terapia' : 
+                                 session.session_type === 'evaluation' ? 'de Evaluación' : 'de Seguimiento'}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {new Date(session.session_date).toLocaleDateString()} - {session.duration_minutes || 0} minutos
+                        </p>
+                        
+                        {session.notes && (
+                          <p className="text-sm text-gray-800 mt-2">{session.notes}</p>
+                        )}
+                        
+                        <div className="flex items-center mt-3 space-x-4 text-xs text-gray-500">
+                          <span className={`px-2 py-1 rounded-full ${
+                            session.status === 'completed' ? 'bg-green-100 text-green-800' :
+                            session.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                            session.status === 'scheduled' ? 'bg-yellow-100 text-yellow-800' :
+                            'bg-gray-100 text-gray-800'
+                          }`}>
+                            {session.status === 'completed' ? '✅ Completada' :
+                             session.status === 'in_progress' ? '🔄 En Progreso' :
+                             session.status === 'scheduled' ? '📅 Programada' : '❌ Cancelada'}
+                          </span>
+                          
+                          {session.mood_before && (
+                            <span>Estado inicial: {session.mood_before}/10</span>
+                          )}
+                          
+                          {session.mood_after && (
+                            <span>Estado final: {session.mood_after}/10</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
