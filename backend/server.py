@@ -271,6 +271,39 @@ async def register_user(user_data: UserCreate):
         )
         await db.professionals.insert_one(professional.dict())
     
+    elif user_data.role == UserRole.PATIENT:
+        # For patient registration, assign to first available professional
+        # In production, this would be more sophisticated
+        professionals = await db.professionals.find().to_list(10)
+        if professionals:
+            professional_id = professionals[0]["id"]  # Assign to first professional
+            patient = Patient(
+                user_id=user_obj.id,
+                professional_id=professional_id,
+                age=25,  # Default age, should be collected in registration
+                gender="no especificado",
+                emergency_contact="Contacto de emergencia no especificado"
+            )
+            await db.patients.insert_one(patient.dict())
+        else:
+            # Create a default professional if none exists
+            default_professional = Professional(
+                user_id="system",
+                license_number="SYSTEM-DEFAULT",
+                specialization="Psicología General",
+                institution="Zentium Assist"
+            )
+            await db.professionals.insert_one(default_professional.dict())
+            
+            patient = Patient(
+                user_id=user_obj.id,
+                professional_id=default_professional.id,
+                age=25,
+                gender="no especificado",
+                emergency_contact="Contacto de emergencia no especificado"
+            )
+            await db.patients.insert_one(patient.dict())
+    
     return user_obj
 
 @api_router.post("/auth/login")
