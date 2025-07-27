@@ -658,22 +658,22 @@ const PatientInterface = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="dashboard-container">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="dashboard-header">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-gray-900">Zentium Assist</h1>
-              <span className="ml-4 px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
-                Paciente
+              <h1 className="brand-title">🧠 Zentium Assist</h1>
+              <span className="ml-4 px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-200 text-green-800 text-sm rounded-full font-semibold">
+                👤 Paciente
               </span>
             </div>
             <button
               onClick={logout}
-              className="px-4 py-2 text-gray-600 hover:text-gray-900 transition"
+              className="px-6 py-2 text-gray-600 hover:text-gray-900 font-medium transition-colors duration-200 rounded-lg hover:bg-gray-100"
             >
-              Cerrar Sesión
+              🚪 Cerrar Sesión
             </button>
           </div>
         </div>
@@ -681,44 +681,28 @@ const PatientInterface = () => {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-8 bg-gray-100 p-1 rounded-lg">
+        <div className="tab-nav mb-8 fade-in">
           <button
             onClick={() => setActiveTab("chat")}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition ${
-              activeTab === "chat"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`tab-button ${activeTab === "chat" ? "active" : ""}`}
           >
             💬 Asistente Virtual
           </button>
           <button
             onClick={() => setActiveTab("tasks")}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition ${
-              activeTab === "tasks"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`tab-button ${activeTab === "tasks" ? "active" : ""}`}
           >
             📋 Mis Tareas ({tasks.filter(t => t.status !== "completed").length})
           </button>
           <button
             onClick={() => setActiveTab("profile")}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition ${
-              activeTab === "profile"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`tab-button ${activeTab === "profile" ? "active" : ""}`}
           >
             👤 Mi Perfil
           </button>
           <button
             onClick={() => setActiveTab("sessions")}
-            className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition ${
-              activeTab === "sessions"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
+            className={`tab-button ${activeTab === "sessions" ? "active" : ""}`}
           >
             📅 Mis Sesiones
           </button>
