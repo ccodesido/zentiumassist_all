@@ -143,12 +143,14 @@ const Login = () => {
 const ProfessionalDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [selectedCrisis, setSelectedCrisis] = useState(null);
   const [newPatient, setNewPatient] = useState({
     age: "",
     gender: "",
     emergency_contact: "",
   });
   const [showAddPatient, setShowAddPatient] = useState(false);
+  const [showCrisisDetails, setShowCrisisDetails] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
