@@ -513,6 +513,11 @@ async def get_analytics_dashboard():
         "system_status": "operational"
     }
 
+# Health check
+@api_router.get("/health")
+async def health_check():
+    return {"status": "healthy", "timestamp": datetime.utcnow()}
+
 # Include the router in the main app
 app.include_router(api_router)
 
