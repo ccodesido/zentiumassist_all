@@ -508,6 +508,177 @@ const ProfessionalDashboard = () => {
           </div>
         </>
       )}
+
+      {/* Crisis Details Modal */}
+      {showCrisisDetails && selectedCrisis && (
+        <>
+          <div 
+            className="modal-overlay"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setShowCrisisDetails(false);
+              }
+            }}
+          >
+            <div className="modal-content scale-in" onClick={(e) => e.stopPropagation()} style={{maxWidth: "40rem"}}>
+              <div className="text-center mb-6">
+                <div className="mx-auto w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                  <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-red-900 mb-2">🚨 Alerta de Crisis - Detalles</h3>
+                <p className="text-red-700">Información completa del incidente</p>
+              </div>
+              
+              <div className="space-y-6">
+                {/* Patient Information */}
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-4 border border-red-200">
+                  <h4 className="text-lg font-bold text-red-900 mb-3 flex items-center">
+                    👤 Información del Paciente
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <strong className="text-red-800">ID:</strong> 
+                      <span className="text-red-700 ml-2">#{selectedCrisis.patient_id?.slice(-6) || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <strong className="text-red-800">Edad:</strong> 
+                      <span className="text-red-700 ml-2">{selectedCrisis.patient?.age || 'Desconocido'} años</span>
+                    </div>
+                    <div>
+                      <strong className="text-red-800">Género:</strong> 
+                      <span className="text-red-700 ml-2">{selectedCrisis.patient?.gender || 'No disponible'}</span>
+                    </div>
+                    <div>
+                      <strong className="text-red-800">Nivel de Riesgo:</strong> 
+                      <span className={`ml-2 px-2 py-1 rounded-full text-xs font-bold ${
+                        selectedCrisis.patient?.risk_level === 'high' ? 'bg-red-200 text-red-800' :
+                        selectedCrisis.patient?.risk_level === 'medium' ? 'bg-yellow-200 text-yellow-800' :
+                        'bg-green-200 text-green-800'
+                      }`}>
+                        {selectedCrisis.patient?.risk_level === 'high' ? '🔴 Alto' :
+                         selectedCrisis.patient?.risk_level === 'medium' ? '🟡 Medio' : '🟢 Bajo'}
+                      </span>
+                    </div>
+                  </div>
+                  {selectedCrisis.patient?.emergency_contact && (
+                    <div className="mt-3 p-3 bg-red-100 rounded-lg">
+                      <strong className="text-red-800">Contacto de Emergencia:</strong>
+                      <p className="text-red-700 font-medium">{selectedCrisis.patient.emergency_contact}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Crisis Message */}
+                <div className="bg-gradient-to-r from-red-100 to-red-50 rounded-xl p-4 border-2 border-red-300">
+                  <h4 className="text-lg font-bold text-red-900 mb-3 flex items-center">
+                    💬 Mensaje de Crisis
+                  </h4>
+                  <div className="bg-white rounded-lg p-4 border border-red-200">
+                    <p className="text-red-800 font-medium leading-relaxed">"{selectedCrisis.message}"</p>
+                    <div className="mt-3 flex items-center justify-between text-sm text-red-600">
+                      <span className="flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                        </svg>
+                        {new Date(selectedCrisis.timestamp).toLocaleString()}
+                      </span>
+                      <span className="px-2 py-1 bg-red-200 text-red-800 rounded-full text-xs font-bold animate-pulse">
+                        CRISIS DETECTADA
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Chat History */}
+                {selectedCrisis.chatHistory && selectedCrisis.chatHistory.length > 0 && (
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-200">
+                    <h4 className="text-lg font-bold text-blue-900 mb-3 flex items-center">
+                      📝 Conversación Reciente (Contexto)
+                    </h4>
+                    <div className="max-h-60 overflow-y-auto space-y-3">
+                      {selectedCrisis.chatHistory.slice(-5).map((msg, index) => (
+                        <div
+                          key={index}
+                          className={`p-3 rounded-lg ${
+                            msg.sender === "patient" 
+                              ? "bg-blue-100 border-l-4 border-blue-500" 
+                              : "bg-gray-100 border-l-4 border-gray-500"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-semibold text-sm">
+                              {msg.sender === "patient" ? "👤 Paciente" : "🤖 Asistente"}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {new Date(msg.timestamp).toLocaleTimeString()}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-800 leading-relaxed">{msg.message}</p>
+                          {msg.is_crisis && (
+                            <span className="inline-block mt-2 px-2 py-1 bg-red-500 text-white text-xs rounded-full animate-pulse">
+                              ⚠️ MENSAJE DE CRISIS
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Recommendations */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+                  <h4 className="text-lg font-bold text-green-900 mb-3 flex items-center">
+                    ✅ Acciones Recomendadas
+                  </h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center p-2 bg-green-100 rounded-lg">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">1</span>
+                      <span className="text-green-800 font-medium">Contactar inmediatamente al paciente por teléfono</span>
+                    </div>
+                    <div className="flex items-center p-2 bg-green-100 rounded-lg">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">2</span>
+                      <span className="text-green-800 font-medium">Evaluar la necesidad de intervención inmediata</span>
+                    </div>
+                    <div className="flex items-center p-2 bg-green-100 rounded-lg">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">3</span>
+                      <span className="text-green-800 font-medium">Documentar la intervención en el historial del paciente</span>
+                    </div>
+                    <div className="flex items-center p-2 bg-green-100 rounded-lg">
+                      <span className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">4</span>
+                      <span className="text-green-800 font-medium">Considerar derivación a servicios de emergencia si es necesario</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => alert("Función de contacto directo en desarrollo")}
+                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    📞 Contactar Paciente
+                  </button>
+                  <button
+                    onClick={() => alert("Función de derivación en desarrollo")}
+                    className="px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-xl hover:from-green-700 hover:to-green-800 transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    🏥 Derivar a Emergencias
+                  </button>
+                </div>
+                <button
+                  onClick={() => setShowCrisisDetails(false)}
+                  className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  ❌ Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
