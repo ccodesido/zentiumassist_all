@@ -361,17 +361,37 @@ const ProfessionalDashboard = () => {
 
         {/* Crisis Alerts */}
         {dashboardData.crisis_alerts.length > 0 && (
-          <div className="mt-8 bg-red-50 border border-red-200 rounded-lg">
-            <div className="px-6 py-4 border-b border-red-200">
-              <h2 className="text-lg font-semibold text-red-900">🚨 Alertas de Crisis</h2>
+          <div className="mt-8 bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200 rounded-xl shadow-lg fade-in" style={{animationDelay: "0.5s"}}>
+            <div className="px-6 py-4 border-b border-red-200 bg-gradient-to-r from-red-100 to-pink-100 rounded-t-xl">
+              <h2 className="text-xl font-bold text-red-900 flex items-center">
+                🚨 Alertas de Crisis
+                <span className="ml-3 px-3 py-1 bg-red-200 text-red-800 text-sm rounded-full font-semibold animate-pulse">
+                  {dashboardData.crisis_alerts.length}
+                </span>
+              </h2>
             </div>
             <div className="p-6">
               {dashboardData.crisis_alerts.map((alert, index) => (
-                <div key={index} className="mb-4 p-4 bg-white border border-red-200 rounded-lg">
-                  <p className="text-sm text-red-800">{alert.message}</p>
-                  <p className="text-xs text-red-600 mt-2">
-                    {new Date(alert.timestamp).toLocaleString()}
-                  </p>
+                <div key={index} className="mb-4 p-4 bg-white border-2 border-red-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mr-3">
+                      <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+                        <span className="text-white text-sm font-bold">!</span>
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-red-800">{alert.message}</p>
+                      <p className="text-xs text-red-600 mt-2 flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                        </svg>
+                        {new Date(alert.timestamp).toLocaleString()}
+                      </p>
+                    </div>
+                    <button className="ml-3 px-3 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition-colors">
+                      Ver Detalles
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
