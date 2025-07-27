@@ -188,6 +188,32 @@ const ProfessionalDashboard = () => {
     }
   };
 
+  const showCrisisDetail = async (alert) => {
+    try {
+      // Get patient information
+      const patientResponse = await axios.get(`${API}/patients/${alert.patient_id}/profile`);
+      
+      // Get recent chat history for context
+      const chatResponse = await axios.get(`${API}/chat/${alert.patient_id}/history?limit=10`);
+      
+      setSelectedCrisis({
+        ...alert,
+        patient: patientResponse.data,
+        chatHistory: chatResponse.data
+      });
+      setShowCrisisDetails(true);
+    } catch (error) {
+      console.error("Error loading crisis details:", error);
+      // Show basic crisis info even if we can't load additional details
+      setSelectedCrisis({
+        ...alert,
+        patient: { id: alert.patient_id, age: "Desconocido", gender: "No disponible" },
+        chatHistory: []
+      });
+      setShowCrisisDetails(true);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("user");
     navigate("/");
