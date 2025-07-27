@@ -416,7 +416,9 @@ const ProfessionalDashboard = () => {
                         {new Date(alert.timestamp).toLocaleString()}
                       </p>
                     </div>
-                    <button className="ml-3 px-3 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition-colors">
+                    <button 
+                      onClick={() => showCrisisDetail(alert)}
+                      className="ml-3 px-3 py-1 bg-red-600 text-white text-xs rounded-lg hover:bg-red-700 transition-colors">
                       Ver Detalles
                     </button>
                   </div>
