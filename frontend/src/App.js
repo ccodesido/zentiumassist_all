@@ -894,50 +894,53 @@ const PatientInterface = () => {
 
         {/* Profile Interface */}
         {activeTab === "profile" && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Mi Perfil</h2>
+          <div className="bg-white rounded-xl shadow-lg p-6 scale-in">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+              👤 Mi Perfil
+              <div className="ml-3 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+            </h2>
             
             {patientProfile ? (
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Edad</label>
-                      <p className="mt-1 text-sm text-gray-900">{patientProfile.age} años</p>
+              <div className="space-y-8 fade-in">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
+                      <label className="block text-sm font-bold text-blue-800 uppercase tracking-wide">Edad</label>
+                      <p className="mt-2 text-2xl font-bold text-blue-900">{patientProfile.age} años</p>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Género</label>
-                      <p className="mt-1 text-sm text-gray-900">{patientProfile.gender}</p>
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-100">
+                      <label className="block text-sm font-bold text-purple-800 uppercase tracking-wide">Género</label>
+                      <p className="mt-2 text-lg font-semibold text-purple-900">{patientProfile.gender}</p>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Diagnóstico</label>
-                      <p className="mt-1 text-sm text-gray-900">{patientProfile.diagnosis || "En evaluación"}</p>
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
+                      <label className="block text-sm font-bold text-green-800 uppercase tracking-wide">Diagnóstico</label>
+                      <p className="mt-2 text-lg font-semibold text-green-900">{patientProfile.diagnosis || "En evaluación"}</p>
                     </div>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Nivel de Riesgo</label>
-                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                  <div className="space-y-6">
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-100">
+                      <label className="block text-sm font-bold text-yellow-800 uppercase tracking-wide">Nivel de Riesgo</label>
+                      <span className={`inline-flex mt-2 px-4 py-2 font-bold rounded-full ${
                         patientProfile.risk_level === 'high' ? 'bg-red-100 text-red-800' :
                         patientProfile.risk_level === 'medium' ? 'bg-yellow-100 text-yellow-800' :
                         'bg-green-100 text-green-800'
                       }`}>
-                        {patientProfile.risk_level === 'high' ? 'Alto' :
-                         patientProfile.risk_level === 'medium' ? 'Medio' : 'Bajo'}
+                        {patientProfile.risk_level === 'high' ? '🔴 Alto' :
+                         patientProfile.risk_level === 'medium' ? '🟡 Medio' : '🟢 Bajo'}
                       </span>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Sesiones Realizadas</label>
-                      <p className="mt-1 text-sm text-gray-900">{patientProfile.session_count || 0}</p>
+                    <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-4 border border-indigo-100">
+                      <label className="block text-sm font-bold text-indigo-800 uppercase tracking-wide">Sesiones Realizadas</label>
+                      <p className="mt-2 text-2xl font-bold text-indigo-900">{patientProfile.session_count || 0}</p>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Última Sesión</label>
-                      <p className="mt-1 text-sm text-gray-900">
+                    <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-4 border border-gray-200">
+                      <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">Última Sesión</label>
+                      <p className="mt-2 text-lg font-semibold text-gray-900">
                         {patientProfile.last_session 
                           ? new Date(patientProfile.last_session).toLocaleDateString()
                           : "No hay sesiones registradas"}
@@ -946,27 +949,53 @@ const PatientInterface = () => {
                   </div>
                 </div>
                 
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Estadísticas de Progreso</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-blue-50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-blue-600">{tasks.filter(t => t.status === "completed").length}</div>
-                      <div className="text-sm text-blue-800">Tareas Completadas</div>
+                <div className="border-t border-gray-200 pt-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                    📊 Estadísticas de Progreso
+                    <div className="ml-3 px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-800 text-sm rounded-full font-semibold">
+                      En tiempo real
                     </div>
-                    <div className="bg-green-50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-green-600">{chatMessages.filter(m => m.sender === "patient").length}</div>
-                      <div className="text-sm text-green-800">Mensajes Enviados</div>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="profile-stat blue">
+                      <div className="text-4xl font-black text-blue-600 mb-2">{tasks.filter(t => t.status === "completed").length}</div>
+                      <div className="text-sm font-bold text-blue-800 uppercase tracking-wide">Tareas Completadas</div>
+                      <div className="mt-2 w-full bg-blue-100 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+                          style={{width: `${Math.min((tasks.filter(t => t.status === "completed").length / Math.max(tasks.length, 1)) * 100, 100)}%`}}
+                        ></div>
+                      </div>
                     </div>
-                    <div className="bg-purple-50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-purple-600">{sessions.length}</div>
-                      <div className="text-sm text-purple-800">Sesiones Registradas</div>
+                    
+                    <div className="profile-stat green">
+                      <div className="text-4xl font-black text-green-600 mb-2">{chatMessages.filter(m => m.sender === "patient").length}</div>
+                      <div className="text-sm font-bold text-green-800 uppercase tracking-wide">Mensajes Enviados</div>
+                      <div className="mt-2 w-full bg-green-100 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-green-500 to-green-600 h-2 rounded-full transition-all duration-500"
+                          style={{width: `${Math.min((chatMessages.filter(m => m.sender === "patient").length / Math.max(chatMessages.length, 1)) * 100, 100)}%`}}
+                        ></div>
+                      </div>
+                    </div>
+                    
+                    <div className="profile-stat purple">
+                      <div className="text-4xl font-black text-purple-600 mb-2">{sessions.length}</div>
+                      <div className="text-sm font-bold text-purple-800 uppercase tracking-wide">Sesiones Registradas</div>
+                      <div className="mt-2 w-full bg-purple-100 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-purple-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                          style={{width: `${Math.min((sessions.length / 10) * 100, 100)}%`}}
+                        ></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="text-center text-gray-500 py-8">
-                <p>Cargando información del perfil...</p>
+              <div className="text-center py-12">
+                <div className="loading-spinner mx-auto mb-4"></div>
+                <p className="text-gray-500">Cargando información del perfil...</p>
               </div>
             )}
           </div>
