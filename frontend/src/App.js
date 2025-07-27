@@ -811,41 +811,45 @@ const PatientInterface = () => {
 
         {/* Tasks Interface */}
         {activeTab === "tasks" && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-6">Mis Tareas Terapéuticas</h2>
+          <div className="bg-white rounded-xl shadow-lg p-6 scale-in">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+              📋 Mis Tareas Terapéuticas
+              <span className="ml-3 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-semibold">
+                {tasks.filter(t => t.status !== "completed").length} pendientes
+              </span>
+            </h2>
             
             {tasks.length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
-                <p>No tienes tareas asignadas en este momento.</p>
-                <p className="text-sm mt-2">Las tareas aparecerán aquí cuando tu profesional las asigne.</p>
+              <div className="text-center py-12 fade-in">
+                <div className="mx-auto h-20 w-20 text-gray-300 mb-4">
+                  📝
+                </div>
+                <p className="text-lg font-medium text-gray-500">No tienes tareas asignadas en este momento.</p>
+                <p className="text-sm mt-2 text-gray-400">Las tareas aparecerán aquí cuando tu profesional las asigne.</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {tasks.map((task) => (
+              <div className="space-y-6">
+                {tasks.map((task, index) => (
                   <div
                     key={task.id}
-                    className={`border rounded-lg p-4 ${
-                      task.status === "completed" ? "bg-green-50 border-green-200" : "bg-white"
-                    }`}
+                    className={`task-card slide-in-left ${task.status === "completed" ? "completed" : ""}`}
+                    style={{animationDelay: `${0.1 * index}s`}}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{task.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">{task.description}</p>
-                        
-                        <div className="flex items-center mt-3 space-x-4 text-xs text-gray-500">
-                          <span className={`px-2 py-1 rounded-full ${
-                            task.task_type === 'homework' ? 'bg-blue-100 text-blue-800' :
-                            task.task_type === 'exercise' ? 'bg-green-100 text-green-800' :
-                            task.task_type === 'reflection' ? 'bg-purple-100 text-purple-800' :
-                            'bg-yellow-100 text-yellow-800'
-                          }`}>
+                        <div className="flex items-center mb-3">
+                          <h3 className="font-bold text-gray-900 text-lg mr-3">{task.title}</h3>
+                          <span className={`badge ${task.task_type}`}>
                             {task.task_type === 'homework' ? '📚 Tarea' :
                              task.task_type === 'exercise' ? '🏃 Ejercicio' :
                              task.task_type === 'reflection' ? '🤔 Reflexión' : '🧘 Mindfulness'}
                           </span>
-                          
-                          <span className={`px-2 py-1 rounded-full ${
+                        </div>
+                        
+                        <p className="text-gray-700 mb-4 leading-relaxed">{task.description}</p>
+                        
+                        <div className="flex items-center space-x-4 text-sm text-gray-500">
+                          <span className={`badge ${
                             task.status === 'completed' ? 'bg-green-100 text-green-800' :
                             task.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-gray-100 text-gray-800'
@@ -855,17 +859,29 @@ const PatientInterface = () => {
                           </span>
 
                           {task.due_date && (
-                            <span>Vence: {new Date(task.due_date).toLocaleDateString()}</span>
+                            <span className="flex items-center">
+                              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                              </svg>
+                              Vence: {new Date(task.due_date).toLocaleDateString()}
+                            </span>
                           )}
+
+                          <span className="flex items-center">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                            </svg>
+                            {new Date(task.created_at).toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
 
                       {task.status !== "completed" && (
                         <button
                           onClick={() => completeTask(task.id)}
-                          className="ml-4 px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition"
+                          className="ml-6 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-semibold"
                         >
-                          Completar
+                          ✨ Completar
                         </button>
                       )}
                     </div>
