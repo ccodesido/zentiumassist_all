@@ -710,17 +710,43 @@ const PatientInterface = () => {
 
         {/* Chat Interface */}
         {activeTab === "chat" && (
-          <div className="bg-white rounded-lg shadow-lg h-96 flex flex-col">
-            <div className="bg-blue-600 text-white p-4 rounded-t-lg">
-              <h2 className="font-semibold">🤖 Asistente Virtual de Zentium</h2>
-              <p className="text-sm text-blue-100">Estoy aquí para apoyarte 24/7</p>
+          <div className="chat-container scale-in">
+            <div className="chat-header">
+              <h2 className="font-bold text-lg flex items-center">
+                🤖 Asistente Virtual de Zentium
+                <div className="ml-3 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              </h2>
+              <p className="text-blue-100 mt-1">💙 Estoy aquí para apoyarte 24/7</p>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div className="chat-messages chat-scroll">
               {chatMessages.length === 0 && (
-                <div className="text-center text-gray-500 py-8">
-                  <p>¡Hola! Soy tu asistente virtual.</p>
-                  <p className="text-sm mt-2">Puedes hablarme sobre cómo te sientes, hacer preguntas o simplemente charlar.</p>
+                <div className="text-center py-12 fade-in">
+                  <div className="mx-auto h-16 w-16 text-blue-300 mb-4">
+                    🤖
+                  </div>
+                  <p className="text-lg font-medium text-gray-700">¡Hola! Soy tu asistente virtual.</p>
+                  <p className="text-sm mt-2 text-gray-500">Puedes hablarme sobre cómo te sientes, hacer preguntas o simplemente charlar.</p>
+                  <div className="mt-4 flex justify-center space-x-2">
+                    <button 
+                      onClick={() => setNewMessage("Hola, ¿cómo estás?")}
+                      className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm hover:bg-blue-200 transition-colors"
+                    >
+                      👋 Saludar
+                    </button>
+                    <button 
+                      onClick={() => setNewMessage("Me siento un poco ansioso hoy")}
+                      className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm hover:bg-purple-200 transition-colors"
+                    >
+                      😰 Hablar sobre ansiedad
+                    </button>
+                    <button 
+                      onClick={() => setNewMessage("¿Qué ejercicios me recomiendas?")}
+                      className="px-4 py-2 bg-green-100 text-green-700 rounded-lg text-sm hover:bg-green-200 transition-colors"
+                    >
+                      🧘 Pedir consejos
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -729,17 +755,11 @@ const PatientInterface = () => {
                   key={index}
                   className={`flex ${
                     message.sender === "patient" ? "justify-end" : "justify-start"
-                  }`}
+                  } mb-4`}
                 >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg text-sm ${
-                      message.sender === "patient"
-                        ? "bg-blue-600 text-white"
-                        : "bg-white text-gray-800 shadow-sm border"
-                    }`}
-                  >
-                    <p>{message.message}</p>
-                    <p className={`text-xs mt-1 ${
+                  <div className={message.sender === "patient" ? "chat-message-user" : "chat-message-assistant"}>
+                    <p className="text-sm leading-relaxed">{message.message}</p>
+                    <p className={`text-xs mt-2 opacity-75 ${
                       message.sender === "patient" ? "text-blue-100" : "text-gray-500"
                     }`}>
                       {new Date(message.timestamp).toLocaleTimeString()}
@@ -747,26 +767,42 @@ const PatientInterface = () => {
                   </div>
                 </div>
               ))}
+              
+              {loading && (
+                <div className="flex justify-start mb-4">
+                  <div className="chat-message-assistant">
+                    <div className="flex items-center space-x-2">
+                      <div className="loading-spinner"></div>
+                      <span className="text-sm text-gray-500">Escribiendo...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               <div ref={chatEndRef} />
             </div>
 
-            <div className="p-4 border-t bg-white rounded-b-lg">
-              <div className="flex space-x-2">
+            <div className="p-6 border-t bg-gradient-to-r from-gray-50 to-white">
+              <div className="flex space-x-3">
                 <input
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+                  onKeyPress={(e) => e.key === "Enter" && !loading && sendMessage()}
                   placeholder="Escribe tu mensaje..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="chat-input flex-1"
                   disabled={loading}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={loading || !newMessage.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                  className="chat-send-button"
                 >
-                  {loading ? "..." : "Enviar"}
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    "🚀 Enviar"
+                  )}
                 </button>
               </div>
             </div>
