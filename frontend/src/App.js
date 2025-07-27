@@ -45,78 +45,91 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
+    <div className="login-container">
+      <div className="login-card fade-in">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Zentium Assist</h1>
-          <p className="text-gray-600">Plataforma de Salud Mental con IA</p>
+          <h1 className="brand-title">Zentium Assist</h1>
+          <p className="brand-subtitle">🧠 Plataforma de Salud Mental con IA</p>
         </div>
 
         <form onSubmit={handleAuth} className="space-y-6">
           {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+            <div className="slide-in-left">
+              <label className="form-label">Nombre Completo</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
+                placeholder="Ingresa tu nombre completo"
                 required
               />
             </div>
           )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <div className={isLogin ? "fade-in" : "slide-in-left"} style={{animationDelay: "0.1s"}}>
+            <label className="form-label">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
+              placeholder="tu@email.com"
               required
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+          <div className={isLogin ? "fade-in" : "slide-in-left"} style={{animationDelay: "0.2s"}}>
+            <label className="form-label">Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="form-input"
+              placeholder="••••••••"
               required
             />
           </div>
 
           {!isLogin && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+            <div className="slide-in-left" style={{animationDelay: "0.3s"}}>
+              <label className="form-label">Tipo de Usuario</label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="form-input"
               >
-                <option value="professional">Profesional</option>
-                <option value="patient">Paciente</option>
+                <option value="professional">👨‍⚕️ Profesional de Salud Mental</option>
+                <option value="patient">👤 Paciente</option>
               </select>
             </div>
           )}
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition duration-200"
+            className="btn-primary scale-in"
+            style={{animationDelay: "0.4s"}}
           >
-            {isLogin ? "Iniciar Sesión" : "Registrarse"}
+            {isLogin ? "🚀 Iniciar Sesión" : "✨ Crear Cuenta"}
           </button>
         </form>
 
-        <div className="mt-6 text-center">
+        <div className="mt-8 text-center fade-in" style={{animationDelay: "0.5s"}}>
           <button
             onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:text-blue-800 text-sm"
+            className="text-gray-600 hover:text-purple-600 text-sm font-medium transition-colors duration-200"
           >
-            {isLogin ? "¿No tienes cuenta? Regístrate" : "¿Ya tienes cuenta? Inicia sesión"}
+            {isLogin ? "¿No tienes cuenta? ✨ Regístrate" : "¿Ya tienes cuenta? 🔑 Inicia sesión"}
           </button>
+        </div>
+
+        {/* Demo Credentials */}
+        <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100 fade-in" style={{animationDelay: "0.6s"}}>
+          <h4 className="text-sm font-semibold text-gray-800 mb-2">🧪 Credenciales de Prueba:</h4>
+          <div className="space-y-1 text-xs text-gray-600">
+            <p><strong>Profesional:</strong> test@zentium.com / TestPass123!</p>
+            <p><strong>Paciente:</strong> paciente@zentium.com / PacientePass123!</p>
+          </div>
         </div>
       </div>
     </div>
