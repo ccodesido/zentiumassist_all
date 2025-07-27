@@ -381,17 +381,26 @@ async def get_patient_profile(patient_id: str):
     patient = await db.patients.find_one({"id": patient_id})
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
+    patient.pop('_id', None)  # Remove MongoDB ObjectId
     return Patient(**patient)
 
 @api_router.get("/patients/{patient_id}/sessions", response_model=List[Session])
 async def get_patient_sessions(patient_id: str):
-    sessions = await db.sessions.find({"patient_id": patient_id}).sort("session_date", -1).to_list(50)
-    return [Session(**session) for session in sessions]
+    sessions_docs = await db.sessions.find({"patient_id": patient_id}).sort("session_date", -1).to_list(50)
+    sessions = []
+    for session_doc in sessions_docs:
+        session_doc.pop('_id', None)  # Remove MongoDB ObjectId
+        sessions.append(Session(**session_doc))
+    return sessions
 
 @api_router.get("/patients/{patient_id}/tasks", response_model=List[Task])
 async def get_patient_tasks(patient_id: str):
-    tasks = await db.tasks.find({"patient_id": patient_id}).sort("created_at", -1).to_list(50)
-    return [Task(**task) for task in tasks]
+    tasks_docs = await db.tasks.find({"patient_id": patient_id}).sort("created_at", -1).to_list(50)
+    tasks = []
+    for task_doc in tasks_docs:
+        task_doc.pop('_id', None)  # Remove MongoDB ObjectId
+        tasks.append(Task(**task_doc))
+    return tasks
 
 # =============================================================================
 # CHAT/AI ASSISTANT
