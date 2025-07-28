@@ -37,10 +37,7 @@ const apiProxy = createProxyMiddleware({
   target: 'http://localhost:8001',
   changeOrigin: true,
   ws: true,
-  pathRewrite: {
-    '^/api': '/api',
-  },
-  logLevel: 'silent'
+  logLevel: 'debug'
 });
 
 // Rutas
