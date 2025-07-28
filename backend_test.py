@@ -11,7 +11,7 @@ from datetime import datetime
 import uuid
 
 class ZentiumAPITester:
-    def __init__(self, base_url="https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com"):
+    def __init__(self, base_url="https://90308466-a382-4768-a654-5790138beb2d.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None

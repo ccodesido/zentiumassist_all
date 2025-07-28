@@ -100,8 +100,8 @@
 
 ## 🚀 URLs de Desarrollo
 
-- **Proyecto original**: https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com
-- **Backend API**: https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com/api
+- **Proyecto original**: https://90308466-a382-4768-a654-5790138beb2d.preview.emergentagent.com
+- **Backend API**: https://90308466-a382-4768-a654-5790138beb2d.preview.emergentagent.com/api
 
 ## 📊 Estado del Proyecto
 

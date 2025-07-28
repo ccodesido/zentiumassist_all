@@ -4,7 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-route
 import axios from "axios";
 
 // Environment configuration for patient subdomain
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com";
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "https://90308466-a382-4768-a654-5790138beb2d.preview.emergentagent.com";
 const API = `${BACKEND_URL}/api`;
 
 // =============================================================================
