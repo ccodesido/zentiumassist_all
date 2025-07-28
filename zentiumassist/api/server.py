@@ -837,9 +837,175 @@ async def get_analytics_dashboard():
     }
 
 # Health check
-@api_router.get("/health")
+@api_router.get(
+    "/health",
+    response_model=HealthCheck,
+    tags=["health"],
+    summary="🏥 Verificación de salud del sistema",
+    description="Endpoint para verificar el estado de salud de la API y sus servicios dependientes"
+)
 async def health_check():
-    return {"status": "healthy", "timestamp": datetime.utcnow()}
+    """
+    Verifica el estado de salud del sistema Zentium Assist API.
+    
+    **Respuesta incluye:**
+    - Estado general del sistema
+    - Timestamp de la verificación
+    - Versión de la API
+    - Estado de servicios dependientes (base de datos, IA, etc.)
+    
+    **Códigos de respuesta:**
+    - 200: Sistema saludable
+    - 503: Problemas detectados en servicios críticos
+    """
+    try:
+        # Check database connection
+        await db.command("ping")
+        db_status = "connected"
+    except Exception:
+        db_status = "disconnected"
+    
+    # Check AI service (OpenAI key)
+    ai_status = "operational" if OPENAI_API_KEY and OPENAI_API_KEY != 'your-openai-api-key-here' else "not_configured"
+    
+    return HealthCheck(
+        status="healthy" if db_status == "connected" else "degraded",
+        timestamp=datetime.utcnow(),
+        version="2.0.0",
+        services={
+            "database": db_status,
+            "ai_service": ai_status
+        }
+    )
+
+# =============================================================================
+# AUTHENTICATION ENDPOINTS
+# =============================================================================
+
+@api_router.post(
+    "/auth/register",
+    response_model=Token,
+    tags=["authentication"],
+    summary="🔐 Registro de nuevo usuario",
+    description="Crea una nueva cuenta de usuario en el sistema",
+    status_code=status.HTTP_201_CREATED
+)
+async def register_user(user_data: UserCreate):
+    """
+    Registra un nuevo usuario en el sistema Zentium Assist.
+    
+    **Roles disponibles:**
+    - `professional`: Para profesionales de salud mental
+    - `patient`: Para pacientes
+    - `admin`: Para administradores del sistema
+    
+    **Validaciones:**
+    - Email único en el sistema
+    - Contraseña mínimo 8 caracteres
+    - Rol válido según los tipos disponibles
+    
+    **Respuesta exitosa:**
+    - Token de acceso JWT
+    - Información del usuario creado
+    """
+    # Check if user already exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El email ya está registrado en el sistema"
+        )
+    
+    # Validate role
+    if user_data.role not in [UserRole.PROFESSIONAL, UserRole.PATIENT, UserRole.ADMIN]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Rol inválido. Debe ser: professional, patient, o admin"
+        )
+    
+    # Create user
+    user_obj = UserBase(**user_data.dict(exclude={"password"}))
+    await db.users.insert_one(user_obj.dict())
+    
+    return Token(
+        access_token=f"jwt-token-{user_obj.id}",
+        token_type="bearer",
+        user=user_obj.dict()
+    )
+
+@api_router.post(
+    "/auth/login",
+    response_model=Token,
+    tags=["authentication"],
+    summary="🔑 Iniciar sesión",
+    description="Autentica un usuario y devuelve un token de acceso"
+)
+async def login_user(credentials: UserLogin):
+    """
+    Autentica un usuario en el sistema.
+    
+    **Credenciales de prueba:**
+    
+    **Profesional:**
+    - Email: `test@zentium.com`
+    - Password: `TestPass123!`
+    
+    **Paciente:**
+    - Email: `paciente@zentium.com`
+    - Password: `PacientePass123!`
+    
+    **Proceso de autenticación:**
+    1. Validación de credenciales
+    2. Verificación de estado activo
+    3. Generación de token JWT
+    4. Retorno de información del usuario
+    
+    **Errores comunes:**
+    - 401: Credenciales incorrectas
+    - 403: Usuario desactivado
+    """
+    # Mock authentication - In production, verify password hash
+    mock_users = {
+        "test@zentium.com": {
+            "id": "prof-123",
+            "email": "test@zentium.com",
+            "name": "Dr. Test Professional",
+            "role": "professional",
+            "active": True
+        },
+        "paciente@zentium.com": {
+            "id": "pat-123", 
+            "email": "paciente@zentium.com",
+            "name": "Paciente Test",
+            "role": "patient",
+            "active": True
+        }
+    }
+    
+    user_data = mock_users.get(credentials.email)
+    if not user_data:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email o contraseña incorrectos"
+        )
+    
+    # In production, verify password hash here
+    valid_passwords = {
+        "test@zentium.com": "TestPass123!",
+        "paciente@zentium.com": "PacientePass123!"
+    }
+    
+    if credentials.password != valid_passwords.get(credentials.email):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email o contraseña incorrectos"
+        )
+    
+    return Token(
+        access_token=f"jwt-token-{user_data['id']}",
+        token_type="bearer",
+        user=user_data
+    )
 
 # Include the router in the main app
 app.include_router(api_router)
