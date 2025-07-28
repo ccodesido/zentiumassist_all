@@ -1,12 +1,15 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.openapi.utils import get_openapi
+from fastapi.responses import HTMLResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timedelta
@@ -25,8 +28,72 @@ db = client[os.environ['DB_NAME']]
 # OpenAI Configuration
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', 'your-openai-api-key-here')
 
-# Create the main app without a prefix
-app = FastAPI(title="Zentium Assist API", description="AI-Powered Mental Health Platform", version="1.0.0")
+# Create the main app with enhanced documentation
+app = FastAPI(
+    title="🧠 Zentium Assist API",
+    description="""
+## AI-Powered Mental Health Platform
+
+Esta API proporciona endpoints para la plataforma Zentium Assist, una solución integral de salud mental con inteligencia artificial.
+
+### Características principales:
+- 🔐 **Autenticación segura** para profesionales y pacientes
+- 👨‍⚕️ **Gestión de profesionales** y instituciones
+- 👤 **Gestión de pacientes** y perfiles médicos
+- 💬 **Chat con IA** para asistencia 24/7
+- 🚨 **Detección de crisis** automática
+- 📊 **Analytics y reportes** en tiempo real
+- ✅ **Sistema de tareas** terapéuticas
+
+### Roles de usuario:
+- **Professional**: Acceso a dashboard médico, gestión de pacientes
+- **Patient**: Acceso a chat de IA, tareas terapéuticas, perfil personal
+- **Admin**: Administración completa del sistema
+
+### Autenticación:
+Utiliza JWT tokens. Incluye el token en el header: `Authorization: Bearer <token>`
+    """,
+    version="2.0.0",
+    contact={
+        "name": "Zentium Assist Support",
+        "url": "https://zentiumassist.com",
+        "email": "support@zentiumassist.com",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    },
+    openapi_tags=[
+        {
+            "name": "authentication",
+            "description": "🔐 Endpoints de autenticación y gestión de usuarios",
+        },
+        {
+            "name": "professionals",
+            "description": "👨‍⚕️ Gestión de profesionales de salud mental",
+        },
+        {
+            "name": "patients",
+            "description": "👤 Gestión de pacientes y perfiles médicos",
+        },
+        {
+            "name": "chat",
+            "description": "💬 Sistema de chat con IA y detección de crisis",
+        },
+        {
+            "name": "tasks",
+            "description": "✅ Sistema de tareas terapéuticas",
+        },
+        {
+            "name": "analytics",
+            "description": "📊 Analytics y reportes del sistema",
+        },
+        {
+            "name": "health",
+            "description": "🏥 Endpoints de salud del sistema",
+        }
+    ]
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
