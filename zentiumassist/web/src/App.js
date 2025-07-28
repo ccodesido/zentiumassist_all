@@ -195,8 +195,8 @@ function App() {
               <h4>Producto</h4>
               <a href="#funcionalidades">Funcionalidades</a>
               <a href="#precios">Precios</a>
-              <a href="/professional">Para Profesionales</a>
-              <a href="/patient">Para Pacientes</a>
+              <a href="https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com:3001">Para Profesionales</a>
+              <a href="https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com:3002">Para Pacientes</a>
             </div>
             <div className="footer-section">
               <h4>Soporte</h4>
