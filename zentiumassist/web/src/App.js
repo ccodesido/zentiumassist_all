@@ -16,8 +16,8 @@ function App() {
               <a href="#precios" className="nav-link">Precios</a>
               <a href="#contacto" className="nav-link">Contacto</a>
               <div className="auth-buttons">
-                <a href="/professional" className="btn btn-secondary">Acceso Profesionales</a>
-                <a href="/patient" className="btn btn-primary">Acceso Pacientes</a>
+                <a href="https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com:3001" className="btn btn-secondary">Acceso Profesionales</a>
+                <a href="https://29d5ee5e-06ed-4e16-bd1a-5f58ec0324b4.preview.emergentagent.com:3002" className="btn btn-primary">Acceso Pacientes</a>
               </div>
             </div>
           </div>
