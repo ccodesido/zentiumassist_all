@@ -1207,6 +1207,89 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Custom OpenAPI schema
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="🧠 Zentium Assist API",
+        version="2.0.0",
+        description=app.description,
+        routes=app.routes,
+    )
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://zentiumassist.com/logo.png"
+    }
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
+
+# Redirect root to docs
+@app.get("/", include_in_schema=False)
+async def redirect_to_docs():
+    return HTMLResponse("""
+    <html>
+        <head>
+            <title>Zentium Assist API</title>
+            <style>
+                body { 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    height: 100vh;
+                    margin: 0;
+                    text-align: center;
+                }
+                .container {
+                    background: rgba(255, 255, 255, 0.1);
+                    padding: 3rem;
+                    border-radius: 20px;
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+                }
+                .logo { font-size: 3rem; margin-bottom: 1rem; }
+                .title { font-size: 2rem; margin-bottom: 1rem; font-weight: 600; }
+                .subtitle { font-size: 1.2rem; margin-bottom: 2rem; opacity: 0.9; }
+                .btn {
+                    display: inline-block;
+                    background: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    text-decoration: none;
+                    padding: 1rem 2rem;
+                    border-radius: 10px;
+                    margin: 0.5rem;
+                    transition: all 0.3s ease;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                }
+                .btn:hover {
+                    background: rgba(255, 255, 255, 0.3);
+                    transform: translateY(-2px);
+                }
+                .version { 
+                    margin-top: 2rem; 
+                    font-size: 0.9rem; 
+                    opacity: 0.7; 
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="logo">🧠</div>
+                <h1 class="title">Zentium Assist API</h1>
+                <p class="subtitle">AI-Powered Mental Health Platform</p>
+                <a href="/docs" class="btn">📚 Swagger Documentation</a>
+                <a href="/redoc" class="btn">📖 ReDoc Documentation</a>
+                <a href="/api/health" class="btn">🏥 Health Check</a>
+                <div class="version">API Version 2.0.0</div>
+            </div>
+        </body>
+    </html>
+    """)
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
