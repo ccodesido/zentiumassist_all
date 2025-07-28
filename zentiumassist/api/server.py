@@ -102,66 +102,252 @@ api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
 
 # =============================================================================
-# MODELS (Compatible with MariaDB structure)
+# ENHANCED MODELS WITH SWAGGER DOCUMENTATION
 # =============================================================================
 
 class UserRole(str):
+    """Roles disponibles en el sistema"""
     PROFESSIONAL = "professional"
     PATIENT = "patient"
     ADMIN = "admin"
 
 class UserBase(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    email: str
-    name: str
-    role: str
-    active: bool = True
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    """Modelo base de usuario del sistema"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="ID único del usuario")
+    email: EmailStr = Field(..., description="Email del usuario (debe ser único)")
+    name: str = Field(..., min_length=2, max_length=100, description="Nombre completo del usuario")
+    role: str = Field(..., description="Rol del usuario en el sistema")
+    active: bool = Field(True, description="Estado activo/inactivo del usuario")
+    created_at: datetime = Field(default_factory=datetime.utcnow, description="Fecha de creación")
+    updated_at: datetime = Field(default_factory=datetime.utcnow, description="Fecha de última actualización")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": "12345678-1234-1234-1234-123456789012",
+                "email": "usuario@zentiumassist.com",
+                "name": "Dr. Juan Pérez",
+                "role": "professional",
+                "active": True,
+                "created_at": "2025-01-01T10:00:00Z",
+                "updated_at": "2025-01-01T10:00:00Z"
+            }
+        }
 
 class UserCreate(BaseModel):
-    email: str
-    name: str
-    password: str
-    role: str
+    """Modelo para crear un nuevo usuario"""
+    email: EmailStr = Field(..., description="Email único del usuario")
+    name: str = Field(..., min_length=2, max_length=100, description="Nombre completo")
+    password: str = Field(..., min_length=8, description="Contraseña (mínimo 8 caracteres)")
+    role: str = Field(..., description="Rol: 'professional', 'patient', o 'admin'")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "email": "nuevo@zentiumassist.com",
+                "name": "Dr. María González",
+                "password": "password123",
+                "role": "professional"
+            }
+        }
 
 class UserLogin(BaseModel):
-    email: str
-    password: str
+    """Modelo para iniciar sesión"""
+    email: EmailStr = Field(..., description="Email del usuario")
+    password: str = Field(..., description="Contraseña del usuario")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "email": "test@zentium.com",
+                "password": "TestPass123!"
+            }
+        }
+
+class Token(BaseModel):
+    """Respuesta de autenticación exitosa"""
+    access_token: str = Field(..., description="JWT token para autenticación")
+    token_type: str = Field("bearer", description="Tipo de token")
+    user: Dict = Field(..., description="Información del usuario autenticado")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "token_type": "bearer",
+                "user": {
+                    "id": "12345678-1234-1234-1234-123456789012",
+                    "email": "test@zentium.com",
+                    "name": "Dr. Test",
+                    "role": "professional"
+                }
+            }
+        }
 
 class Professional(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    license_number: str
-    specialization: str
-    institution: str
-    patients: List[str] = []
-    active_sessions: int = 0
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    """Modelo de profesional de salud mental"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="ID único del profesional")
+    user_id: str = Field(..., description="ID del usuario asociado")
+    license_number: str = Field(..., description="Número de licencia profesional")
+    specialization: str = Field(..., description="Especialización médica")
+    institution: str = Field(..., description="Institución donde trabaja")
+    patients: List[str] = Field(default=[], description="Lista de IDs de pacientes asignados")
+    active_sessions: int = Field(0, description="Número de sesiones activas")
+    created_at: datetime = Field(default_factory=datetime.utcnow, description="Fecha de registro")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": "prof-12345678-1234-1234-1234-123456789012",
+                "user_id": "user-12345678-1234-1234-1234-123456789012",
+                "license_number": "PSI-12345",
+                "specialization": "Psicología Clínica",
+                "institution": "Hospital General",
+                "patients": ["pat-1", "pat-2"],
+                "active_sessions": 5,
+                "created_at": "2025-01-01T10:00:00Z"
+            }
+        }
 
 class ProfessionalCreate(BaseModel):
-    license_number: str
-    specialization: str
-    institution: str
+    """Modelo para crear perfil profesional"""
+    license_number: str = Field(..., description="Número de licencia profesional")
+    specialization: str = Field(..., description="Área de especialización")
+    institution: str = Field(..., description="Institución médica")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "license_number": "PSI-67890",
+                "specialization": "Psicología Infantil",
+                "institution": "Clínica San Rafael"
+            }
+        }
 
 class Patient(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    professional_id: str
-    age: int
-    gender: str
-    diagnosis: Optional[str] = None
-    risk_level: str = "low"  # low, medium, high
-    emergency_contact: str
-    session_count: int = 0
-    last_session: Optional[datetime] = None
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    """Modelo de paciente"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="ID único del paciente")
+    user_id: str = Field(..., description="ID del usuario asociado")
+    professional_id: str = Field(..., description="ID del profesional asignado")
+    age: int = Field(..., ge=1, le=120, description="Edad del paciente")
+    gender: str = Field(..., description="Género del paciente")
+    diagnosis: Optional[str] = Field(None, description="Diagnóstico médico (opcional)")
+    risk_level: str = Field("low", description="Nivel de riesgo: low, medium, high")
+    emergency_contact: str = Field(..., description="Contacto de emergencia")
+    session_count: int = Field(0, description="Número total de sesiones")
+    last_session: Optional[datetime] = Field(None, description="Fecha de última sesión")
+    created_at: datetime = Field(default_factory=datetime.utcnow, description="Fecha de registro")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": "pat-12345678-1234-1234-1234-123456789012",
+                "user_id": "user-12345678-1234-1234-1234-123456789012",
+                "professional_id": "prof-12345678-1234-1234-1234-123456789012",
+                "age": 28,
+                "gender": "Femenino",
+                "diagnosis": "Trastorno de ansiedad",
+                "risk_level": "medium",
+                "emergency_contact": "+34 600 123 456",
+                "session_count": 15,
+                "last_session": "2025-01-28T14:30:00Z",
+                "created_at": "2025-01-01T10:00:00Z"
+            }
+        }
 
 class PatientCreate(BaseModel):
-    age: int
-    gender: str
-    emergency_contact: str
-    professional_id: str
+    """Modelo para crear perfil de paciente"""
+    age: int = Field(..., ge=1, le=120, description="Edad del paciente")
+    gender: str = Field(..., description="Género")
+    emergency_contact: str = Field(..., description="Teléfono de contacto de emergencia")
+    professional_id: str = Field(..., description="ID del profesional asignado")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "age": 32,
+                "gender": "Masculino",
+                "emergency_contact": "+34 600 987 654",
+                "professional_id": "prof-12345678-1234-1234-1234-123456789012"
+            }
+        }
+
+class ChatMessage(BaseModel):
+    """Modelo para mensajes de chat"""
+    message: str = Field(..., min_length=1, max_length=1000, description="Contenido del mensaje")
+    session_id: Optional[str] = Field(None, description="ID de sesión (opcional)")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "message": "Hola, me siento un poco ansioso hoy",
+                "session_id": "session-12345678-1234-1234-1234-123456789012"
+            }
+        }
+
+class ChatResponse(BaseModel):
+    """Respuesta del sistema de chat con IA"""
+    response: str = Field(..., description="Respuesta generada por la IA")
+    session_id: str = Field(..., description="ID de la sesión de chat")
+    crisis_detected: bool = Field(False, description="Indica si se detectó una crisis")
+    crisis_level: Optional[str] = Field(None, description="Nivel de crisis si se detectó")
+    recommendations: List[str] = Field(default=[], description="Recomendaciones del sistema")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "response": "Entiendo que te sientes ansioso. Es normal tener estos sentimientos. ¿Puedes contarme más sobre qué específicamente te está causando ansiedad?",
+                "session_id": "session-12345678-1234-1234-1234-123456789012",
+                "crisis_detected": False,
+                "crisis_level": None,
+                "recommendations": ["Practica ejercicios de respiración", "Contacta a tu profesional si empeora"]
+            }
+        }
+
+class Task(BaseModel):
+    """Modelo de tarea terapéutica"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), description="ID único de la tarea")
+    patient_id: str = Field(..., description="ID del paciente asignado")
+    title: str = Field(..., description="Título de la tarea")
+    description: str = Field(..., description="Descripción detallada")
+    category: str = Field(..., description="Categoría de la tarea")
+    completed: bool = Field(False, description="Estado de completado")
+    due_date: Optional[datetime] = Field(None, description="Fecha límite")
+    created_at: datetime = Field(default_factory=datetime.utcnow, description="Fecha de creación")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "id": "task-12345678-1234-1234-1234-123456789012",
+                "patient_id": "pat-12345678-1234-1234-1234-123456789012",
+                "title": "Ejercicio de respiración",
+                "description": "Practica respiración profunda por 10 minutos",
+                "category": "mindfulness",
+                "completed": False,
+                "due_date": "2025-01-30T12:00:00Z",
+                "created_at": "2025-01-28T10:00:00Z"
+            }
+        }
+
+class HealthCheck(BaseModel):
+    """Respuesta del endpoint de salud"""
+    status: str = Field(..., description="Estado del sistema")
+    timestamp: datetime = Field(..., description="Timestamp de la verificación")
+    version: str = Field("2.0.0", description="Versión de la API")
+    services: Dict[str, str] = Field(default={}, description="Estado de servicios dependientes")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "status": "healthy",
+                "timestamp": "2025-01-28T10:00:00Z",
+                "version": "2.0.0",
+                "services": {
+                    "database": "connected",
+                    "ai_service": "operational"
+                }
+            }
+        }
 
 class Session(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
